@@ -72,8 +72,14 @@ const App = () => {
   };
 
   const handleSaveFiscal = async () => {
+    console.log("🚀 Iniciando guardado de datos fiscales...");
+    console.log("📦 Contexto actual:", context);
+
     if (!context || !context.account) {
-        monday.execute("notice", { message: "Error: No se detectó la cuenta de Monday", type: "error" });
+        const msg = "❌ Error: No se detectó la cuenta de Monday. Asegurate de estar dentro de un tablero.";
+        console.error(msg);
+        alert(msg);
+        monday.execute("notice", { message: msg, type: "error" });
         return;
     }
 
@@ -89,15 +95,22 @@ const App = () => {
             fecha_inicio: fiscal.fechaInicio
         };
 
-        await axios.post(`${API_URL}/companies`, payload);
+        console.log("📤 Enviando payload al backend:", `${API_URL}/companies`, payload);
+
+        const response = await axios.post(`${API_URL}/companies`, payload);
         
+        console.log("✅ Respuesta del servidor:", response.data);
+        
+        alert("¡Éxito! Los datos se guardaron correctamente.");
         monday.execute("notice", {
             message: "Datos fiscales guardados con éxito en la base de datos",
             type: "success",
             duration: 5000
         });
     } catch (err) {
-        console.error("Error al guardar:", err);
+        console.error("❌ Error detallado de Axios:", err);
+        const errorMsg = err.response?.data?.error || err.message || "Error desconocido";
+        alert("Error al guardar: " + errorMsg);
         monday.execute("notice", {
             message: "Error al guardar los datos. Verificá la conexión con el backend.",
             type: "error"
