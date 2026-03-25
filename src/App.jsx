@@ -608,7 +608,7 @@ const App = () => {
                     <div className="header-right">
                         <div className="factura-title">Factura</div>
                         <div className="line"><span className="label">Punto de Venta:</span> {fiscal.puntoVenta || "0001"} &nbsp;&nbsp; <span className="label">Comp. Nro:</span> 00000001</div>
-                        <div className="line"><span className="label">Fecha de Emisión:</span> Hoy</div>
+                        <div className="line"><span className="label">Fecha de Emisión:</span> {renderVisualSelect("fecha_emision", "Fecha Emisión")}</div>
                         <div className="line"><span className="label">CUIT:</span> {fiscal.cuit || "20-12345678-9"}</div>
                         <div className="line"><span className="label">Inicio Actividades:</span> {fiscal.fechaInicio || "-"}</div>
                     </div>
@@ -617,11 +617,11 @@ const App = () => {
                 <div className="info-row">
                     <div style={{display: "flex", marginBottom: "4px"}}>
                         <div style={{width: "42%"}}><span className="label">CUIT:</span> {renderVisualSelect("receptor_cuit", "CUIT")}</div>
-                        <div style={{flex: 1}}><span className="label">Razón Social:</span> {renderVisualSelect("receptor_razon_social", "Razón Social")}</div>
+                        <div style={{flex: 1}}><span className="label">Razón Social:</span> Dato fijo (no mapeable)</div>
                     </div>
                     <div style={{display: "flex", marginBottom: "4px"}}>
-                        <div style={{width: "42%"}}><span className="label">Condición IVA:</span> {renderVisualSelect("receptor_condicion_frente_iva", "Cond. IVA")}</div>
-                        <div style={{flex: 1}}><span className="label">Domicilio:</span> {renderVisualSelect("receptor_domicilio", "Domicilio Cliente")}</div>
+                        <div style={{width: "42%"}}><span className="label">Condición IVA:</span> Dato fijo (no mapeable)</div>
+                        <div style={{flex: 1}}><span className="label">Domicilio:</span> Dato fijo (no mapeable)</div>
                     </div>
                 </div>
 
