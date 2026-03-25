@@ -32,7 +32,6 @@ const IconCheck = () => (
 const MENU_ITEMS = [
   { id: "datos", label: "Datos Fiscales", icon: <IconBuilding /> },
   { id: "certificados", label: "Certificados AFIP", icon: <IconCert /> },
-  { id: "mapping", label: "Mapeo de Columnas", icon: <IconList /> },
   { id: "mapping_v2", label: "Mapeo Visual (Nuevo)", icon: <IconList /> },
   { id: "invoices", label: "Emitir Facturas", icon: <IconFile /> },
 ];
@@ -41,16 +40,6 @@ const IVA_OPTIONS = [
   "Responsable Inscripto",
   "Monotributista",
   "Exento",
-];
-
-const INVOICE_FIELDS = [
-  { id: "receptor_cuit", label: "CUIT del Cliente" },
-  { id: "receptor_razon_social", label: "Razón Social Cliente" },
-  { id: "receptor_domicilio", label: "Domicilio del Cliente" },
-  { id: "concepto", label: "Concepto / Descripción" },
-  { id: "cantidad", label: "Cantidad" },
-  { id: "precio_unitario", label: "Precio Unitario" },
-  { id: "subtotal", label: "Total Factura" }
 ];
 
 const App = () => {
@@ -505,40 +494,6 @@ const App = () => {
               <span>
                 <strong>Seguridad:</strong> Tu clave privada se encripta con algoritmos bancarios antes de salir de tu computadora y nunca se guarda en texto plano.
               </span>
-            </div>
-          </section>
-        )}
-
-        {/* ═══ SECCIÓN: MAPEO DE COLUMNAS ═══ */}
-        {activeSection === "mapping" && (
-          <section className="section">
-            <div className="section-header">
-              <h1 className="section-title">Mapeo de Columnas</h1>
-              <p className="section-subtitle">
-                Asociá las columnas de tu tablero de Monday con los campos requeridos para la factura.
-              </p>
-            </div>
-
-            <div className="mapping-list">
-              {INVOICE_FIELDS.map(field => (
-                <div key={field.id} className="mapping-row">
-                  <span className="mapping-label">{field.label}</span>
-                  <select 
-                    className="mapping-select"
-                    value={mapping[field.id] || ""} 
-                    onChange={e => setMapping({...mapping, [field.id]: e.target.value})}
-                  >
-                    <option value="">Seleccionar columna...</option>
-                    {columns.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                  </select>
-                </div>
-              ))}
-            </div>
-
-            <div className="form-actions">
-              <button className="btn-primary" onClick={() => alert("Mapeo guardado localmente")}>
-                Guardar Mapeo
-              </button>
             </div>
           </section>
         )}
