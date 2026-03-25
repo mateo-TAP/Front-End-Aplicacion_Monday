@@ -172,10 +172,13 @@ const App = () => {
             const subitemsRes = await monday.api(
               `query { boards(ids: [${subitemsBoardId}]) { columns { id title type } } }`
             );
-            const subCols = subitemsRes.data?.boards?.[0]?.columns?.map((c) => ({
-              value: c.id,
-              label: c.title,
-            })) || [];
+            const subCols =
+              subitemsRes.data?.boards?.[0]?.columns
+                ?.filter((c) => c.id !== "name")
+                .map((c) => ({
+                  value: c.id,
+                  label: c.title,
+                })) || [];
             setSubitemColumns(subCols);
           } catch (err) {
             console.error("No se pudieron cargar columnas de subitems:", err);
@@ -263,7 +266,7 @@ const App = () => {
     if (activeSection !== "mapping_v2" && mappingCompleted) {
       setIsMappingLocked(true);
     }
-  }, [activeSection, hasSavedFiscalData, hasSavedCertificates]);
+  }, [activeSection, hasSavedFiscalData, hasSavedCertificates, mappingCompleted]);
 
   const handleFiscalChange = (field, value) => {
     setFiscal((prev) => ({ ...prev, [field]: value }));
@@ -426,6 +429,14 @@ const App = () => {
     );
   };
 
+  const getMappedColumnLabel = (fieldId, scope = "board") => {
+    const selectedValue = mapping[fieldId];
+    if (!selectedValue) return "sin columna seleccionada";
+    const options = scope === "subitem" ? subitemColumns : columns;
+    const found = options.find((o) => o.value === selectedValue);
+    return found?.label || selectedValue;
+  };
+
   return (
     <div className="app-container">
       <aside className="sidebar">
@@ -582,7 +593,7 @@ const App = () => {
 
             <div className="form-actions">
               {hasSavedFiscalData && (
-                <button className="btn-secondary" onClick={() => setIsFiscalLocked((prev) => !prev)}>
+                <button type="button" className="btn-secondary" onClick={() => setIsFiscalLocked((prev) => !prev)}>
                   {isFiscalLocked ? "Modificar" : "Bloquear"}
                 </button>
               )}
@@ -690,7 +701,7 @@ const App = () => {
 
             <div className="form-actions">
                 {hasSavedCertificates && (
-                  <button className="btn-secondary" onClick={() => setIsCertificatesLocked((prev) => !prev)}>
+                  <button type="button" className="btn-secondary" onClick={() => setIsCertificatesLocked((prev) => !prev)}>
                     {isCertificatesLocked ? "Modificar" : "Bloquear"}
                   </button>
                 )}
@@ -800,7 +811,12 @@ const App = () => {
                         <tbody>
                             <tr>
                                 <td className="label">Importe Total: $</td>
-                                <td className="value">{renderVisualSelect("subtotal", "Total Final", "subitem")}</td>
+                                <td className="value">
+                                  Calculado automaticamente
+                                  <div style={{ fontSize: "10px", marginTop: "2px" }}>
+                                    Usa la suma de "{getMappedColumnLabel("subtotal", "subitem")}".
+                                  </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -810,7 +826,7 @@ const App = () => {
             </div>
 
             <div className="form-actions" style={{marginTop: "20px"}}>
-              <button className="btn-secondary" onClick={() => setIsMappingLocked((prev) => !prev)}>
+              <button type="button" className="btn-secondary" onClick={() => setIsMappingLocked((prev) => !prev)}>
                 {isMappingLocked ? "Modificar" : "Bloquear"}
               </button>
               <button className="btn-primary" onClick={handleSaveVisualMapping} disabled={isMappingLocked}>
