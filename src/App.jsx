@@ -613,6 +613,32 @@ const App = () => {
     }
   };
 
+  const updateItemStatusInMonday = async (itemId, statusLabel) => {
+    if (!boardConfig.status_column_id || !boardId || !itemId) return;
+
+    const statusValueJson = JSON.stringify({ label: statusLabel });
+    const statusValueLiteral = JSON.stringify(statusValueJson);
+
+    const mutation = `mutation {
+      change_column_value(
+        board_id: ${Number(boardId)},
+        item_id: ${Number(itemId)},
+        column_id: "${boardConfig.status_column_id}",
+        value: ${statusValueLiteral}
+      ) { id }
+    }`;
+
+    await monday.api(mutation);
+  };
+
+  const createItemUpdateInMonday = async (itemId, body) => {
+    if (!itemId || !body) return;
+    const mutation = `mutation {
+      create_update(item_id: ${Number(itemId)}, body: ${JSON.stringify(body)}) { id }
+    }`;
+    await monday.api(mutation);
+  };
+
   const handleEmitFacturaC = async () => {
     if (!context?.account?.id || !boardId) {
       alert("No se pudo identificar cuenta/tablero para emitir factura C.");
@@ -656,6 +682,12 @@ const App = () => {
         throw new Error("No se encontró el item en Monday para emitir Factura C");
       }
 
+      try {
+        await updateItemStatusInMonday(emitForm.itemId.trim(), COMPROBANTE_STATUS_FLOW.processing);
+      } catch (statusErr) {
+        console.error("No se pudo setear estado en procesamiento:", statusErr);
+      }
+
       const payload = {
         monday_account_id: context.account.id.toString(),
         board_id: boardId,
@@ -686,6 +718,19 @@ const App = () => {
         }, null, 2),
       });
 
+      try {
+        await updateItemStatusInMonday(emitForm.itemId.trim(), COMPROBANTE_STATUS_FLOW.success);
+        const afipResult = response.data?.afip_result;
+        if (afipResult?.cae) {
+          await createItemUpdateInMonday(
+            emitForm.itemId.trim(),
+            `Comprobante emitido correctamente. CAE: ${afipResult.cae}. Vencimiento CAE: ${afipResult.cae_vencimiento || "N/D"}. Número: ${afipResult.numero_comprobante || "N/D"}.`
+          );
+        }
+      } catch (statusErr) {
+        console.error("No se pudo actualizar estado/nota de éxito en Monday:", statusErr);
+      }
+
       monday.execute("notice", {
         message: response.data?.afip_result?.cae ? "Factura C emitida en AFIP" : "Factura C procesada en backend",
         type: "success",
@@ -700,6 +745,16 @@ const App = () => {
         message: errorMsg,
         detail: errorDetail,
       });
+
+      try {
+        await updateItemStatusInMonday(emitForm.itemId?.trim(), COMPROBANTE_STATUS_FLOW.error);
+        await createItemUpdateInMonday(
+          emitForm.itemId?.trim(),
+          `Error al emitir comprobante: ${errorMsg}${errorDetail ? `\nDetalle: ${errorDetail}` : ""}`
+        );
+      } catch (statusErr) {
+        console.error("No se pudo actualizar estado/nota de error en Monday:", statusErr);
+      }
 
       monday.execute("notice", {
         message: errorMsg,
