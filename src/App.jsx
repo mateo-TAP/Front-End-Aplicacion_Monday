@@ -653,9 +653,10 @@ const App = () => {
       });
     } catch (err) {
       const errorMsg = err?.response?.data?.error || err?.message || "Error al guardar token";
-      alert(errorMsg);
+      const errorDetail = err?.response?.data?.details || err?.response?.data?.code || "";
+      alert(errorDetail ? `${errorMsg}\n\nDetalle: ${errorDetail}` : errorMsg);
       monday.execute("notice", {
-        message: errorMsg,
+        message: errorDetail ? `${errorMsg} (${errorDetail})` : errorMsg,
         type: "error",
         duration: 4000,
       });
