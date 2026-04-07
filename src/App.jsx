@@ -44,7 +44,7 @@ const IconCheck = () => (
 
 const MENU_ITEMS = [
   { id: "datos", label: "Datos Fiscales", icon: <IconBuilding /> },
-  { id: "certificados", label: "Certificados AFIP", icon: <IconCert /> },
+  { id: "certificados", label: "Certificados ARCA", icon: <IconCert /> },
   { id: "mapping_v2", label: "Mapeo Visual (Nuevo)", icon: <IconList /> },
   { id: "board_setup", label: "Configurar Tablero", icon: <IconSettings /> },
   { id: "invoices", label: "Emitir Facturas", icon: <IconFile /> },
